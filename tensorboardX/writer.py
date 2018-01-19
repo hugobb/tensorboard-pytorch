@@ -25,7 +25,7 @@ from .src import event_pb2
 from .src import summary_pb2
 from .src import graph_pb2
 from .event_file_writer import EventFileWriter
-from .summary import scalar, histogram, image, audio, text, pr_curve
+from .summary import scalar, histogram, image, audio, text, pr_curve, figure
 from .graph import graph
 from .graph_onnx import gg
 from .embedding import make_mat, make_sprite, make_tsv, append_pbtxt
@@ -336,6 +336,20 @@ class SummaryWriter(object):
             img_tensor: :math:`(3, H, W)`. Use ``torchvision.utils.make_grid()`` to prepare it is a good idea.
         """
         self.file_writer.add_summary(image(tag, img_tensor), global_step)
+
+    def add_figure(self, tag, figure, global_step=None):
+        """Add pyplot figure to summary.
+
+        Note that this requires the ``pillow`` package.
+
+        Args:
+            tag (string): Data identifier
+            img_tensor (torch.Tensor): Image data
+            global_step (int): Global step value to record
+        Shape:
+            img_tensor: :math:`(3, H, W)`. Use ``torchvision.utils.make_grid()`` to prepare it is a good idea.
+        """
+        self.file_writer.add_summary(figure(tag, figure), global_step)
 
     def add_audio(self, tag, snd_tensor, global_step=None, sample_rate=44100):
         """Add audio data to summary.

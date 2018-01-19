@@ -158,6 +158,28 @@ def image(tag, tensor):
     image = make_image(tensor)
     return Summary(value=[Summary.Value(tag=tag, image=image)])
 
+def figure(tag, figure):
+    """Outputs a `Summary` protocol buffer with images.
+    The summary has up to `max_images` summary values containing images. The
+    images are built from `figure`.
+    The `name` in the outputted Summary.Value protobufs is generated based on the
+    name, with a suffix depending on the max_outputs setting:
+    *  If `max_outputs` is 1, the summary value tag is '*name*/image'.
+    *  If `max_outputs` is greater than 1, the summary value tags are
+       generated sequentially as '*name*/image/0', '*name*/image/1', etc.
+    Args:
+      tag: A name for the generated node. Will also serve as a series name in
+        TensorBoard.
+      figure: A matplotlib `figure`.
+    Returns:
+      A scalar `Tensor` of type `string`. The serialized `Summary` protocol
+      buffer.
+    """
+    tag = _clean_tag(tag)
+    figure.canvas.draw()
+    image = np.fromstring(figure.canvas.tostring_rgb(), dtype=np.uint8, sep='')
+    image = data.reshape(figure.canvas.get_width_height()[::-1] + (3,))
+    return Summary(value=[Summary.Value(tag=tag, image=image)])
 
 def make_image(tensor):
     """Convert an numpy representation image to Image protobuf"""
